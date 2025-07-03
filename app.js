@@ -13,8 +13,7 @@ const { connectDatabase } = require('./database/database');
 connectDatabase();
 
 app.get('/',(req, res)=>{
-      res.json({
-            status: 200,
+      res.status(200).json({
             message : "Welcome to the Content Management System",
       })
 })
@@ -22,22 +21,27 @@ app.get('/',(req, res)=>{
 // **create a Blog API
 app.post('/createBlog', async(req, res)=>{
       const { title, subTitle, description } = req.body;
+      // Or
+      // const title = req.body.title;
+      // const subTitle = req.body.subTitle;
+      // const description = req.body.description;
 
       // Insert to database logic here
-      await Blog.create({
+      const blog = await Blog.create({
             title : title,
             subTitle : subTitle,
             description : description
       })
 
-      res.json({
-            status: 200,
-            message: "Blog created successfully"
-      })
-      // Or
-      // res.status(200).json({
-      //       message: "Blog created successfully"
-      // })
+      if(blog){
+            res.status(201).json({
+                  message: "Blog created successfully"
+            })
+      } else {
+            res.status(404).json({
+                  message: "Failed to create blog"
+            })
+      }
 })
 
 // **Get all blogs API
@@ -47,13 +51,11 @@ app.get("/blogs", async(req, res)=>{
 
       // checks if blogs contains data or not
       if(blogs.length === 0){
-            return res.json({
-                  status: 404,
+            res.status(404).json({
                   message: "No blogs found"
             })
       }else{
-            return res.json({
-                  status: 200,
+            res.status(200).json({
                   message: "Blogs fetched successfully",
                   data: blogs
             })
@@ -72,12 +74,12 @@ app.get("/blogs/:id", async(req, res)=>{
       
       // // checks if blog exists or not
       // if(blog.length === 0){ // if blog is not found
-      //       return res.json({
+      //       res.json({
       //             status: 404,
       //             message: "Blog not found"
       //       })
       // }else{
-      //       return res.json({
+      //       res.json({
       //             status: 200,
       //             message: "Blog fetched successfully",
       //             data: blog
@@ -87,14 +89,62 @@ app.get("/blogs/:id", async(req, res)=>{
       // **Alternative way to fetch single blog
       const blog = await Blog.findById(id) // findById() returns a single object
       if(blog){
-            return res.json({
-                  status: 200,
+            res.status(200).json({
                   message: "Blog fetched successfully",
                   data: blog
             })
       }else{
-            return res.json({
-                  status: 404,
+            // res.json({
+            //       status: 404,
+            //       message: "Blog not found"
+            // })
+            // **OR
+            res.status(404).json({
+                  message: "Blog not found"
+            })
+      }
+})
+
+// ** Update a blog API
+app.patch("/blogs/:id", async (req, res)=>{
+      const { id } = req.params;
+      // **Or
+      // const id = req.params.id;
+      const { title, subTitle, description } = req.body;
+
+      // Update blog logic here
+      const blog = await Blog.findByIdAndUpdate(id, {
+            title: title,
+            subTitle: subTitle,
+            description: description
+      })
+
+      if(blog){
+            res.status(200).json({
+                  message: "Blog updated successfully"
+            })
+      }else{
+            res.status(404).json({
+                  message: "Blog not found"
+            })
+      }
+})
+
+// **Delete a blog API
+app.delete("/blogs/:id", async (req, res)=>{
+      const { id } = req.params;
+      // **OR
+      // const id = req.params.id;
+
+      // Delete blog logic here
+      const blog = await Blog.findByIdAndDelete(id)
+
+      if(blog){
+            res.status(200).json({
+                  message: "Blog deleted successfully"
+            })
+      }else{
+            res.status(404).json({
                   message: "Blog not found"
             })
       }
