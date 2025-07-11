@@ -5,11 +5,11 @@ const blogSchema = new mongoose.Schema({
             type: String,
             required: true
       },
-      subTitle: {
+      description: {
             type: String,
             required: true
       },
-      description: {
+      category: {
             type: String,
             required: true
       }
