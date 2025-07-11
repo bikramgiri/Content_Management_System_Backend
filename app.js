@@ -17,12 +17,6 @@ app.use(cors({
 const { connectDatabase } = require('./database/database');
 connectDatabase();
 
-// Seed a user (for testing)
-app.get('/seed-user', async (req, res) => {
-  const user = await User.create({ username: 'bikram' });
-  res.status(201).json({ message: 'User created', user });
-});
-
 app.get('/',(req, res)=>{
       res.status(200).json({
             message : "Welcome to the Content Management System",
